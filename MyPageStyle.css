@@ -1,0 +1,92 @@
+@charset "ISO-8859-1";
+body{
+	margin: 40px;
+}
+/* ############################################### HOMEPAGE ######################## */
+div.wrapper {
+	font-family:sans-serif;
+    display: grid;
+	grid-gap: 10px;
+    grid-template-columns: 33% 66%;
+	background-color: FloralWhite;
+}
+
+div.Left{
+	overflow: auto;
+	padding: 20px;
+	background-color: #fff5e2;
+	border: 5px solid;
+	border-color: SaddleBrown;
+  	border-radius: 1%;
+	box-shadow: 3px 4px 10px;
+	grid-column: 1;
+	grid-row: 1 / span 2;
+
+}
+div.Right-Top{
+	text-align:center;
+	overflow: auto;
+	padding: 20px;
+	background-color: #fff5e2;
+	border: 5px solid;
+	border-color: SaddleBrown;
+  	border-radius: 1%;
+	box-shadow: 3px 4px 10px;
+	grid-column: 2;
+	grid-row: 1;
+}
+
+div.Right-Bot{
+	text-align:center;
+	overflow: auto;
+	padding: 20px;
+	background-color: #fff5e2;
+	border: 5px solid;
+	border-color: SaddleBrown;
+  	border-radius: 1%;
+	box-shadow: 3px 4px 10px;
+	grid-column: 2;
+	grid-row: 2;
+}
+div.Right-Social{
+	text-align:center;
+	overflow: auto;
+	padding: 20px;
+	background-color: #fff5e2;
+	border: 5px solid;
+	border-color: SaddleBrown;
+  	border-radius: 1%;
+	box-shadow: 3px 4px 10px;
+	grid-column: 2;
+	grid-row: 3;
+}
+div.Stoixia{
+	text-align: center;
+}
+div.perks{
+	padding-left: 5px;
+	padding-right: 5px;
+	color:SaddleBrown;
+}
+	
+i{
+	color:SaddleBrown;
+}
+img{
+	width:100%;
+	border-radius: 1%;
+}
+h1{
+	text-shadow: 2px 2px 3px #000000;
+	color: SaddleBrown;
+}
+
+li{
+	color:SaddleBrown;
+}
+li.calendar{
+	color:DarkRed;
+}
+i.fa-calendar-alt{
+	color:DarkRed;
+}
