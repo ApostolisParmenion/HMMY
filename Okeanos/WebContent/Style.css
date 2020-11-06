@@ -47,13 +47,13 @@ div.formreg-popup {
 	text-align:center;
 	border: groove;
 }
-.formreg-popup .btn {
+.btn {
   background-color: #6cb9dd;
   color: black;
   height:40px;
   border-color:#6cb9dd;
   cursor: pointer;
-  width: 48%;
+  width: 100%;
 }
 
 .formreg-popup .cancel {
@@ -63,4 +63,14 @@ div.formreg-popup {
 }
 
 
-
+th, td {
+	color: #aad1f2;
+  text-align: center;
+  padding: 8px;
+}
+tr:hover {
+	background-color: #336d84;
+}
+tr:nth-child(odd) {
+	background-color: #2c4f6b;
+}
