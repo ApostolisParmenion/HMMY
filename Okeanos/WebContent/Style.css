@@ -1,0 +1,66 @@
+@charset "ISO-8859-1";
+body{
+	display:flex;
+	justify-content:space-arround;
+	align-items:center;
+	flex-direction:column;
+	font-family:sans-serif;
+	
+	background-image: url('photos/wel.jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+
+}
+h2{
+	font-family: Impact, Charcoal, sans-serif;
+font-size : 50px;
+	 color: #ecf8f9;
+	 text-shadow: 6px 4px #000000;
+}
+.open-button {
+  background-color: #6cb9dd;
+  color: black;
+  padding: 4px 5px;
+  border-color:#6cb9dd;
+  cursor: pointer;
+  opacity: 0.9;
+  width: 15%;
+  height:40px;
+  
+}
+
+div.formreg-popup {
+  width:18%;
+  height:100%;
+  display: none;
+  position: relative;
+  border: none;
+  opacity: 0.9;
+  text-align:center;
+}
+
+.formreg-popup input{
+	width:99%;
+	height:30px;
+	border:none;
+	text-align:center;
+	border: groove;
+}
+.formreg-popup .btn {
+  background-color: #6cb9dd;
+  color: black;
+  height:40px;
+  border-color:#6cb9dd;
+  cursor: pointer;
+  width: 48%;
+}
+
+.formreg-popup .cancel {
+  bottom:0px;
+  border-color:#e0e0e0;
+  background-color: #e0e0e0;
+}
+
+
+
