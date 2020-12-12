@@ -6,6 +6,7 @@ from ortools.constraint_solver import pywrapcp
 
 
 def create_data_model(Graph,ways,Route):
+    """Storesdsadaaaaaaa the data for the problem."""
     """Stores the data for the problem."""
     data = {}
     flag=0
@@ -20,7 +21,7 @@ def create_data_model(Graph,ways,Route):
             temp.append(dijkstra[i].get_distance(Graph[u][0]))
         data['distance_matrix'].append(temp)
 
-    data['num_vehicles'] = 2
+    data['num_vehicles'] = 2 aaaaaaaaaaaaaaaa
     data['depot'] = 0
     print(dijkstra[0].get_distance(Graph[6][0]))
     return data
