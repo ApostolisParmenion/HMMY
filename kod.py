@@ -1,16 +1,32 @@
 import os.path
 
-import DijkstraAlg
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
+from dijkstra import Graph
+from dijkstra import DijkstraSPF
 
+def DijkstraMain(graphos):
+    graph = Graph()
+    nodes=list()
+    for i in graphos:
+        nodes.append(i[0])
+    k=0
+    for i in graphos:
+        for j in i:
+            if (j<10000 and j!=i[0]):
+                graph.add_edge(i[0], k, j)  
+            k=j
+    dijkstra=[]
+    for i in range(len(nodes)):
+        dijkstra.append(DijkstraSPF(graph, graphos[i][0]))
+    return dijkstra
 
 def create_data_model(Graph,ways,Route):
     """Stores the data for the problem."""
     data = {}
     flag=0
     data['distance_matrix']=[]
-    dijkstra=DijkstraAlg.DijkstraMain(Graph)
+    dijkstra=DijkstraMain(Graph)
     nodes=list()
     for i in Graph:
         nodes.append(i[0])
@@ -164,8 +180,6 @@ def main():
     # Print solution on console.
     if solution:
         print_solution(data, manager, routing, solution,Route,ways)
-
-    print("EE")
 
 
 if __name__ == '__main__':
