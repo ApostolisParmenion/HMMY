@@ -1,5 +1,5 @@
 import os.path
-
+from termcolor import colored
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
 from dijkstra import Graph
@@ -21,7 +21,7 @@ def DijkstraMain(graphos):
         dijkstra.append(DijkstraSPF(graph, graphos[i][0]))
     return dijkstra
 
-def create_data_model(Graph,ways,Route):
+def create_data_model(Graph,ways,Route,depot,vehiclesGiven):
     """Stores the data for the problem."""
     data = {}
     flag=0
@@ -33,12 +33,15 @@ def create_data_model(Graph,ways,Route):
     for i in Route:
         temp=[]
         for u in Route:
+            if(dijkstra[i].get_distance(Graph[u][0])=="inf"):
+                print(colored("Unfortunately the path is not accesible",'red'))
+                return
             temp.append(dijkstra[i].get_distance(Graph[u][0]))
         data['distance_matrix'].append(temp)
 
-    data['num_vehicles'] = 2
-    data['depot'] = 0
-    print(dijkstra[0].get_distance(Graph[6][0]))
+    data['num_vehicles'] = vehiclesGiven
+    data['depot'] = depot
+    #sprint(dijkstra[0].get_distance(Graph[6][0]))
     return data
 
 def print_solution(data, manager, routing, solution,route,ways):
@@ -62,20 +65,21 @@ def print_solution(data, manager, routing, solution,route,ways):
         max_route_distance = max(route_distance, max_route_distance)
     print('Maximum of the route distances: {}m'.format(max_route_distance))
 
-
-def main():
-    
-    mapPathStr="map3.osm"
+def MakeWays():
+    ways={}
+    ways['Nodes']=[]
+    ways['Names']=[]
+    ways['OneWay']=[]
+    mapPathStr="map2.osm"
     f = open(mapPathStr, "r",encoding="utf8")
     line=f.readline()
-    ways=[]
-    Route=[0,6,17,22]
-    wayDescr=[]
     flag=False
     flag2=False
     tempStr=""
     while(line!=""):
-        wayDescr=[]
+        oneWay=False
+        waysNodes=[]
+        waysNames=[]
         temp=line.split()
         if(temp[0] == "<way"):
             while(temp[0] != "</way>"):
@@ -83,16 +87,16 @@ def main():
                     if(("id=" in k) and ("uid=" not in k)):
                         k=k.replace('id=','')
                         k=k.replace('"', '')
-                        wayDescr.append(int(k))
+                        waysNodes.append(int(k))
                     elif("ref=" in k):
                         k=k.replace('ref=','')
                         k=k.replace('"', '')
                         k=k.replace('/>', '')
-                        wayDescr.append(int(k)) 
-                    #elif("oneway" in k):
-                    #    k=k.replace('ref=','')
-                    #    k=k.replace('"', '')
-                    #    wayDescr.append("ONEWAY") 
+                        waysNodes.append(int(k)) 
+                    elif("oneway" in k):
+                        k=k.replace('ref=','')
+                        k=k.replace('"', '')
+                        oneWay=True
                     elif("name" in k ):
                         flag=True
                     elif(flag):
@@ -101,7 +105,7 @@ def main():
                         if('/>' in k):
                             k=k.replace('/>', '')
                             tempStr=tempStr+k
-                            wayDescr.append(tempStr)   
+                            waysNames.append(tempStr)   
                             flag=False
                             flag2=True
                             tempStr=""
@@ -111,11 +115,16 @@ def main():
 
                 temp=line.split()
             if(flag2):
-                ways.append(wayDescr)
+                ways['Nodes'].append(waysNodes)
+                ways['Names'].append(waysNames)
+                ways['OneWay'].append(oneWay)
+                
                 flag2=False
         else:
             line=f.readline()
+    return ways
 
+def MakeGraph(ways):
     Graph=[]
     ConnectetWays=[]
     for i in ways:
@@ -134,9 +143,74 @@ def main():
                     
         Graph.append(ConnectetWays)
         ConnectetWays=[] 
-    data=create_data_model(Graph,ways,Route)
+    return Graph
+def main():
+    ways=MakeWays()
+    Graph=MakeGraph(ways['Nodes'])
+    waysFound=""
+    EndpointsGiven=False
+    RoadFound=False
+    vehiclesGiven=1
+    Route=[]
+    depot=0
+    vehicleSet=False
+    while(vehicleSet==False):
+        try:
+            vehiclesGiven=int(input("Give the number of vehicles (1-50): "))
+            while (vehiclesGiven<0 and vehiclesGiven>50):
+                vehiclesGiven=int(input("Give the number of vehicles (1-50): "))
+            vehicleSet=True
+        except:
+            print(colored("Please enter a valid number",'red'))
+    UserInput=input("Choose an action:\n 1: See all roads \n 2: Set starting road (Default is the first road on the list)\n 3: Set destination roads (At least "+ str(vehiclesGiven)+ ") (" + waysFound +")\n 4: Run!\n")
+    while(True):
+        RoadFound=False
+        if(UserInput==str(1)):
+            for i in ways['Names']:
+                print(i)
+        elif(UserInput==str(2)):
+            while(RoadFound==False):
+                roadGiven=input("Give the name of the road: ")
+                for i in range(len(ways['Names'])):
+                    for j in ways['Names'][i]:
+                        if(j==roadGiven):
+                            print(colored("Road Set!",'green'))
+                            depot=i
+                            RoadFound=True
+                            break
+                    if(RoadFound):
+                        break
+                if(RoadFound==False):
+                    print(colored("Road name NOT Found!!",'red'))
+        elif(UserInput==str(3)):
+            while(RoadFound==False):
+                roadGiven=input("Give the name of the road: ")
+                for i in range(len(ways['Names'])):
+                    for j in ways['Names'][i]:
+                        if(j==roadGiven):
+                            print(colored("Road Added!",'green'))
+                            if(waysFound==""):
+                                waysFound+= roadGiven
+                            else:
+                                waysFound+= ", "+roadGiven
+                            Route.append(i)
+                            RoadFound=True
+                            EndpointsGiven=True
+                            break
+                    if(RoadFound):
+                            break
+                if(RoadFound==False):
+                    print(colored("Road name NOT Found!!",'red'))
+        elif(UserInput==str(4)):
+            if(EndpointsGiven==False and len(Route)>=vehiclesGiven):
+                print(colored(' Please Give all the information needed!', 'red'))
+            else:
+                break
+        UserInput=input("Choose an action:\n 1: See all roads \n 2: Set starting road (Default is the first road on the list)\n 3: Set destination roads (At least "+ str(vehiclesGiven)+ ") (" + waysFound +")\n 4: Run!\n")
+    
+    data=create_data_model(Graph,ways['Nodes'],Route,depot,vehiclesGiven)
     for i in data['distance_matrix']:
-        print (i)
+       print (i)
     # Create the routing index manager.
     manager = pywrapcp.RoutingIndexManager(len(data['distance_matrix']),
                                            data['num_vehicles'], data['depot'])
@@ -179,7 +253,7 @@ def main():
 
     # Print solution on console.
     if solution:
-        print_solution(data, manager, routing, solution,Route,ways)
+        print_solution(data, manager, routing, solution,Route,ways['Names'])
 
 
 if __name__ == '__main__':
