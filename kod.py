@@ -21,7 +21,7 @@ def DijkstraMain(graphos):
         dijkstra.append(DijkstraSPF(graph, graphos[i][0]))
     return dijkstra
 
-def create_data_model(Graph,ways,Route,depot,vehiclesGiven):
+def create_data_model(Graph,ways,weigths,Route,depot,vehiclesGiven):
     """Stores the data for the problem."""
     data = {}
     flag=0
@@ -36,7 +36,7 @@ def create_data_model(Graph,ways,Route,depot,vehiclesGiven):
             if(dijkstra[i].get_distance(Graph[u][0])=="inf"):
                 print(colored("Unfortunately the path is not accesible",'red'))
                 return
-            temp.append(dijkstra[i].get_distance(Graph[u][0]))
+            temp.append( dijkstra[i].get_distance(Graph[u][0]) * weigths[i] )
         data['distance_matrix'].append(temp)
 
     data['num_vehicles'] = vehiclesGiven
@@ -70,13 +70,16 @@ def MakeWays():
     ways['Nodes']=[]
     ways['Names']=[]
     ways['OneWay']=[]
+    ways['Weight']=[]
     mapPathStr="map2.osm"
     f = open(mapPathStr, "r",encoding="utf8")
     line=f.readline()
-    flag=False
-    flag2=False
     tempStr=""
     while(line!=""):
+        CheckIfIsOk=False
+        CheckIfHasName=False
+        CheckIfHighway=False
+        weight=1
         oneWay=False
         waysNodes=[]
         waysNames=[]
@@ -98,28 +101,49 @@ def MakeWays():
                         k=k.replace('"', '')
                         oneWay=True
                     elif("name" in k ):
-                        flag=True
-                    elif(flag):
+                        CheckIfHasName=True
+                    elif("highway" in k ):   
+                        CheckIfHighway=True
+                    elif(CheckIfHighway):
+                        if("living_street" in k ):
+                            weight=2
+                        elif("residential" in k ):
+                            weight=1.7
+                        elif("unclassified" in k ):
+                            weight=1.5
+                        elif("tertiary" in k ):
+                            weight=1.3
+                        elif("secondary" in k ):
+                            weight=1.2
+                        elif("primary" in k ):
+                            weight=1.1
+                        elif("primary_link" in k ):
+                            weight=1.2
+                        else:
+                            break
+                        CheckIfHighway=False
+                    elif(CheckIfHasName):
                         k=k.replace('v="','')
                         k=k.replace('"', '')
                         if('/>' in k):
                             k=k.replace('/>', '')
                             tempStr=tempStr+k
                             waysNames.append(tempStr)   
-                            flag=False
-                            flag2=True
+                            CheckIfHasName=False
+                            CheckIfIsOk=True
                             tempStr=""
                         else:
                             tempStr=tempStr+k+' '
+                    
                 line=f.readline()
 
                 temp=line.split()
-            if(flag2):
+            if(CheckIfIsOk):
                 ways['Nodes'].append(waysNodes)
                 ways['Names'].append(waysNames)
                 ways['OneWay'].append(oneWay)
-                
-                flag2=False
+                ways['Weight'].append(weight)
+                CheckIfIsOk=False
         else:
             line=f.readline()
     return ways
@@ -208,7 +232,7 @@ def main():
                 break
         UserInput=input("Choose an action:\n 1: See all roads \n 2: Set starting road (Default is the first road on the list)\n 3: Set destination roads (At least "+ str(vehiclesGiven)+ ") (" + waysFound +")\n 4: Run!\n")
     
-    data=create_data_model(Graph,ways['Nodes'],Route,depot,vehiclesGiven)
+    data=create_data_model(Graph,ways['Nodes'],ways['Weight'],Route,depot,vehiclesGiven)
     for i in data['distance_matrix']:
        print (i)
     # Create the routing index manager.
